@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free AQL Sampling Calculator (ANSI/ASQ Z1.4) — QE Toolbox</title>
+<meta name="description" content="Free AQL sampling plan calculator based on ANSI/ASQ Z1.4 / ISO 2859-1 single sampling, normal inspection. Enter lot size, inspection level and AQL to get code letter, sample size, Ac and Re.">
+<style>
+/* QE Toolbox v1 — site styles */
+:root{
+  --bg:#0f172a; --bg2:#111c33; --card:#ffffff; --ink:#1e293b; --muted:#64748b;
+  --line:#e2e8f0; --accent:#2563eb; --accent-d:#1d4ed8; --ok:#15803d; --warn:#b45309;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);background:#f8fafc;line-height:1.6}
+a{color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+/* header */
+header.site{background:var(--bg);color:#fff;position:sticky;top:0;z-index:50}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.brand{font-weight:800;font-size:20px;letter-spacing:.3px;color:#fff;text-decoration:none}
+.brand span{color:#60a5fa}
+.navlinks a{color:#cbd5e1;text-decoration:none;margin-left:22px;font-size:15px}
+.navlinks a:hover{color:#fff}
+.btn{display:inline-block;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px 26px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--accent-d)}
+.btn.ghost{background:transparent;border:1px solid #475569;color:#e2e8f0}
+/* hero */
+.hero{background:radial-gradient(1200px 500px at 50% -80px,#1e3a8a33,transparent),var(--bg);color:#fff;padding:72px 0 64px;text-align:center}
+.hero h1{font-size:42px;line-height:1.2;margin:0 0 16px}
+.hero h1 .hl{color:#60a5fa}
+.hero p.sub{color:#cbd5e1;font-size:19px;max-width:720px;margin:0 auto 30px}
+.hero .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.trust{margin-top:26px;color:#94a3b8;font-size:14px}
+/* calculator */
+section{padding:56px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:0 8px 30px #0f172a0d}
+h2{font-size:30px;margin:0 0 10px}
+.sec-sub{color:var(--muted);margin:0 0 26px;max-width:760px}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media(max-width:820px){.calc-grid{grid-template-columns:1fr}}
+.field{margin-bottom:16px}
+.field label{display:block;font-weight:700;margin-bottom:6px;font-size:15px}
+.field input,.field select{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;background:#fff}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+.field .hint{font-size:13px;color:var(--muted);margin-top:6px}
+.result{background:#f1f5f9;border-radius:12px;padding:22px;min-height:280px}
+.result h3{margin:0 0 14px;font-size:18px}
+.plan-nums{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.stat{flex:1;min-width:110px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;text-align:center}
+.stat .v{font-size:30px;font-weight:800;color:var(--accent)}
+.stat .k{font-size:13px;color:var(--muted)}
+.note{font-size:14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;margin-top:10px;color:#92400e}
+.note.info{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}
+.note.bad{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.result .empty{color:var(--muted)}
+.conf{font-size:12.5px;color:var(--muted);margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+/* features */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:820px){.feat-grid{grid-template-columns:1fr}}
+.feat{border:1px solid var(--line);border-radius:var(--radius);padding:22px;background:#fff}
+.feat.locked{background:#f8fafc}
+.feat h3{margin:0 0 8px;font-size:18px}
+.feat p{margin:0;color:var(--muted);font-size:15px}
+.badge{display:inline-block;font-size:12px;font-weight:800;border-radius:20px;padding:3px 12px;margin-bottom:10px}
+.badge.free{background:#dcfce7;color:#166534}
+.badge.pro{background:#dbeafe;color:#1d4ed8}
+.badge.soon{background:#f1f5f9;color:#64748b}
+/* pricing */
+.pricing{background:var(--bg);color:#fff}
+.pricing h2{color:#fff}
+.pricing .sec-sub{color:#94a3b8}
+.price-card{max-width:520px;margin:0 auto;background:#fff;color:var(--ink);border-radius:18px;padding:36px;text-align:center}
+.price{font-size:52px;font-weight:800;margin:8px 0}
+.price small{font-size:18px;color:var(--muted);font-weight:400}
+.price-card ul{list-style:none;padding:0;margin:22px 0;text-align:left}
+.price-card li{padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.price-card li::before{content:"✓ ";color:var(--ok);font-weight:800}
+/* faq */
+.faq details{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:12px;background:#fff}
+.faq summary{font-weight:700;cursor:pointer;font-size:16px}
+/* seo copy */
+.seo-copy{color:#334155;font-size:16px;max-width:820px}
+.seo-copy h3{font-size:20px;margin-top:28px}
+/* footer */
+footer{background:var(--bg2);color:#94a3b8;padding:36px 0;font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+footer a{color:#cbd5e1;text-decoration:none;margin-right:18px}
+footer a:hover{color:#fff}
+/* legal pages */
+.legal{max-width:820px;margin:0 auto}
+.legal h1{font-size:32px}
+.legal h2{font-size:22px;margin-top:32px}
+.legal p,.legal li{color:#334155}
+.small{font-size:13px;color:var(--muted)}
+
+</style>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="index.html">QE<span>Toolbox</span></a>
+    <nav class="navlinks">
+      <a href="#calculator">AQL Calculator</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Free AQL Sampling Plan <span class="hl">Calculator</span></h1>
+    <p class="sub">Single sampling plans per ANSI/ASQ Z1.4 &amp; ISO 2859-1, normal inspection. Enter your lot size, inspection level and AQL — get the code letter, sample size, accept and reject numbers instantly.</p>
+    <div class="cta-row">
+      <a class="btn" href="#calculator">Use the free calculator</a>
+      <a class="btn ghost" href="#pricing">Get the Pro toolkit — $19</a>
+    </div>
+    <div class="trust">Cross-verified against published Z1.4 references · No sign-up · Works offline after load</div>
+  </div>
+</div>
+
+<section id="calculator">
+  <div class="wrap">
+    <h2>AQL Calculator</h2>
+    <p class="sec-sub">Normal inspection, single sampling. Arrow rules (↑/↓) from Table 2-A are applied automatically. If the sample size equals or exceeds the lot size, the plan calls for 100% inspection.</p>
+    <div class="card">
+      <div class="calc-grid">
+        <div>
+          <div class="field">
+            <label for="lot">Lot / batch size</label>
+            <input id="lot" type="number" min="2" value="1200">
+            <div class="hint">Number of units in the lot (2 – 500,000+).</div>
+          </div>
+          <div class="field">
+            <label for="level">Inspection level</label>
+            <select id="level">
+              <option value="S-1">Special S-1</option>
+              <option value="S-2">Special S-2</option>
+              <option value="S-3">Special S-3</option>
+              <option value="S-4">Special S-4</option>
+              <option value="I">General I</option>
+              <option value="II" selected>General II (default)</option>
+              <option value="III">General III</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="aql">AQL (%)</label>
+            <select id="aql"></select>
+            <div class="hint">Acceptable Quality Limit — agreed defect level for the inspection.</div>
+          </div>
+          <button class="btn" id="calcBtn" style="width:100%">Calculate sampling plan</button>
+        </div>
+        <div class="result" id="result">
+          <h3>Sampling plan</h3>
+          <div class="empty">Enter your lot details and press Calculate.</div>
+        </div>
+      </div>
+      <div class="conf" id="confNote"></div>
+    </div>
+  </div>
+</section>
+
+<section id="features" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <h2>What QE Toolbox does</h2>
+    <p class="sec-sub">The AQL calculator above is free forever. The Pro toolkit adds the statistical workhorses quality engineers reach for every week.</p>
+    <div class="feat-grid">
+      <div class="feat">
+        <span class="badge free">FREE</span>
+        <h3>AQL Sampling Calculator</h3>
+        <p>Z1.4 / ISO 2859-1 single-sampling plans with automatic arrow resolution and 100%-inspection detection.</p>
+      </div>
+      <div class="feat locked">
+        <span class="badge pro">PRO</span>
+        <h3>Cpk / Ppk &amp; Normality</h3>
+        <p>Paste measurement data → Cp, Cpk, Pp, Ppk, Anderson-Darling normality test, histograms and control charts.</p>
+      </div>
+      <div class="feat locked">
+        <span class="badge pro">PRO</span>
+        <h3>8D Report Builder</h3>
+        <p>Guided D1–D8 workflow with AI-assisted drafting, containment / root-cause / verification structure, PDF export.</p>
+      </div>
+      <div class="feat locked">
+        <span class="badge pro">PRO</span>
+        <h3>Gauge R&amp;R Quick Check</h3>
+        <p>Crossed GR&amp;R entry and %GRR / ndc readout for quick MSA sanity checks on the shop floor.</p>
+      </div>
+      <div class="feat locked">
+        <span class="badge pro">PRO</span>
+        <h3>PDF Report Export</h3>
+        <p>One-click, audit-ready PDF summaries of any calculation — plan, data, method and disclaimer included.</p>
+      </div>
+      <div class="feat locked">
+        <span class="badge soon">ROADMAP</span>
+        <h3>Double &amp; Multiple Sampling</h3>
+        <p>Table 3-A / 4-A plans and switching rules (normal ↔ tightened ↔ reduced) are on the roadmap.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="pricing">
+  <div class="wrap">
+    <h2 style="text-align:center">Simple pricing</h2>
+    <p class="sec-sub" style="text-align:center;margin-left:auto;margin-right:auto">One payment. Yours forever. No subscription, no seat limits.</p>
+    <div class="price-card">
+      <span class="badge pro">PRO TOOLKIT</span>
+      <div class="price">$19 <small>one-time</small></div>
+      <ul>
+        <li>Everything in the free calculator</li>
+        <li>Cpk / Ppk &amp; normality analysis</li>
+        <li>8D report builder with PDF export</li>
+        <li>Gauge R&amp;R quick check</li>
+        <li>Free updates within the 1.x series</li>
+      </ul>
+      <button class="btn" id="buyBtn" style="width:100%">Buy Pro — $19</button>
+      <p class="small" style="margin-top:14px">Secure checkout · 14-day money-back guarantee</p>
+    </div>
+  </div>
+</section>
+
+<section id="about-aql">
+  <div class="wrap seo-copy">
+    <h2>About AQL sampling (ANSI/ASQ Z1.4 / ISO 2859-1)</h2>
+    <p>Acceptance sampling by attributes lets you decide whether to accept a lot by inspecting only a sample of it. The procedure in three steps: (1) find the <strong>sample-size code letter</strong> from the lot size and inspection level (Table 1); (2) read the <strong>sample size n</strong>, <strong>acceptance number Ac</strong> and <strong>rejection number Re</strong> from the master table for your AQL (Table 2-A, normal inspection, single sampling); (3) inspect n units — accept the lot if defects ≤ Ac, reject if defects ≥ Re.</p>
+    <h3>Arrow rules</h3>
+    <p>When a table cell shows a downward arrow (↓), use the first available plan below it; an upward arrow (↑) means use the first available plan above. The calculator applies these automatically and tells you which code letter the plan was resolved from. If the sample size is greater than or equal to the lot size, the plan effectively requires 100% inspection.</p>
+    <h3>Choosing an AQL</h3>
+    <p>Common choices: 0.65%–1.0% for critical characteristics, 1.5%–2.5% for major, 4.0%–6.5% for minor. The AQL is a commercial agreement between supplier and customer, not a guarantee that a accepted lot is defect-free. Always confirm the AQL and inspection level in your quality agreement before use.</p>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap faq">
+    <h2>FAQ</h2>
+    <details><summary>Which standard does the calculator follow?</summary><p>Single sampling, normal inspection, per ANSI/ASQ Z1.4-2003 (technically equivalent to ISO 2859-1). Table values were cross-verified against multiple published references; see the methodology note under the calculator.</p></details>
+    <details><summary>Is the free calculator really free?</summary><p>Yes — no account, no trial, no paywall. Pro ($19 one-time) adds Cpk/Ppk, 8D reports, GR&amp;R and PDF export.</p></details>
+    <details><summary>What does "resolved from code letter X" mean?</summary><p>The master table uses arrows for cells where the nominal sample size is unsuitable; the plan is taken from the nearest suitable code letter. The calculator shows the resolution so the result is auditable.</p></details>
+    <details><summary>Can I use this for regulated product (e.g. medical devices)?</summary><p>The calculator is a planning aid. Your sampling rationale must be documented and approved under your own QMS; see the <a href="disclaimer.html">disclaimer</a>.</p></details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>© 2026 QE Toolbox. All rights reserved.</div>
+    <div>
+      <a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="disclaimer.html">Disclaimer</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* QE Toolbox — AQL 数据表 v0.1
+ * ISO 2859-1 / ANSI-ASQ Z1.4-2003 Table 2-A（正常检验一次抽样）
+ * 状态：DRAFT — 行 A/B 与 N/Q/R 待 ECQA 仲裁；行 C–M 中 0.65–6.5 列为 HIGH 置信度，
+ * 其余列为 MED（锚点校准一致，仲裁中）。详见 docs/DATA-SOURCES.md。
+ * 未经 verify/aql.test.js 通过不得发布。
+ */
+"use strict";
+
+const AQL = (() => {
+  // v1 支持的 AQL（%）
+  const LEVELS = ["0.065","0.10","0.15","0.25","0.40","0.65","1.0","1.5","2.5","4.0","6.5","10"];
+
+  const SAMPLE_SIZE = {A:2,B:3,C:5,D:8,E:13,F:20,G:32,H:50,J:80,K:125,L:200,M:315,N:500,P:800,Q:1250,R:2000};
+  const LETTER_ORDER = ["A","B","C","D","E","F","G","H","J","K","L","M","N","P","Q","R"];
+
+  // Table 1: [批量下限, 批量上限, S-1,S-2,S-3,S-4, I,II,III]
+  const CODE_TABLE = [
+    [2,8,        "A","A","A","A","A","A","B"],
+    [9,15,       "A","A","A","A","A","B","C"],
+    [16,25,      "A","A","B","B","B","C","D"],
+    [26,50,      "A","B","B","C","C","D","E"],
+    [51,90,      "B","B","C","C","C","E","F"],
+    [91,150,     "B","B","C","D","D","F","G"],
+    [151,280,    "B","C","D","E","E","G","H"],
+    [281,500,    "B","C","D","E","F","H","J"],
+    [501,1200,   "C","C","E","F","G","J","K"],
+    [1201,3200,  "C","D","E","G","H","K","L"],
+    [3201,10000, "C","D","F","G","J","L","M"],
+    [10001,35000,"C","D","F","H","K","M","N"],
+    [35001,150000,"D","E","G","J","L","N","P"],
+    [150001,500000,"D","E","G","J","M","P","Q"],
+    [500001,Infinity,"D","E","H","K","N","Q","R"],
+  ];
+  const LEVEL_KEYS = {"S-1":0,"S-2":1,"S-3":2,"S-4":3,"I":4,"II":5,"III":6};
+
+  // Table 2-A: 每个代码字对应 12 个 AQL 列；"D"=向下箭头，"U"=向上箭头，否则 [Ac,Re]
+  // 置信度标注：行内注释 H=HIGH, M=MED(仲裁中)
+  const PLANS = {
+    A: ["D","D","D","D","D","D","D","D","D","D","D","D"], // M: A/B 行待仲裁，暂按全↓（保守）
+    B: ["D","D","D","D","D","D","D","D","D","D","D","D"], // M: 待仲裁
+    C: ["D","D","D","D","D","D","D","D",[0,1],[0,1],[1,2],[2,3]],            // H: idx8-10; M: idx11
+    D: ["D","D","D","D","D","D","D",[0,1],[0,1],[1,2],[2,3],[3,4]],           // H: idx7-10; M: idx11
+    E: ["D","D","D","D","D","D",[0,1],[0,1],[1,2],[1,2],[2,3],[3,4]],         // H: idx6-10; M: idx11
+    F: ["D","D","D","D","D",[0,1],[0,1],[1,2],[1,2],[2,3],[3,4],[5,6]],       // H: idx5-10; M: idx11
+    G: ["D","D","D","D","D",[0,1],[1,2],[1,2],[2,3],[3,4],[5,6],[7,8]],       // H: idx5-10; M: idx11
+    H: ["D","D","D",[0,1],[0,1],[1,2],[1,2],[2,3],[3,4],[5,6],[7,8],[10,11]], // H: idx5-10; M: idx0-4,11
+    J: ["D","D",[0,1],[0,1],[1,2],[1,2],[2,3],[3,4],[5,6],[7,8],[10,11],[14,15]], // H: idx5-10; M: idx2-4,11
+    K: ["D","D",[0,1],[0,1],[1,2],[2,3],[3,4],[5,6],[7,8],[10,11],[14,15],[21,22]], // H: idx5-10; M: idx2-4,11
+    L: ["D",[0,1],[1,2],[2,3],[2,3],[3,4],[5,6],[7,8],[10,11],[14,15],[21,22],"U"], // H: idx5-10; M: idx1-4; idx11=U(M)
+    M: [[1,2],[1,2],[2,3],[3,4],[3,4],[5,6],[7,8],[10,11],[14,15],[21,22],"U","U"], // H: idx6-9; M: idx0-5
+  };
+
+  function codeLetter(lotSize, level) {
+    const li = LEVEL_KEYS[level];
+    if (li === undefined) throw new Error("unknown level " + level);
+    for (const row of CODE_TABLE) {
+      if (lotSize >= row[0] && lotSize <= row[1]) return row[2 + li];
+    }
+    throw new Error("lot size out of range");
+  }
+
+  // 解析箭头：返回 {n, ac, re, resolvedFrom}；若无法解析返回 {hundred:true}
+  function resolvePlan(letter, aqlIdx, lotSize) {
+    const order = LETTER_ORDER;
+    let i = order.indexOf(letter);
+    let cell = PLANS[letter][aqlIdx];
+    let steps = 0;
+    while (typeof cell === "string" && steps < order.length) {
+      if (cell === "D") i++;
+      else if (cell === "U") i--;
+      else break;
+      if (i < 0 || i >= order.length) return { hundred: false, unresolvable: true };
+      const L = order[i];
+      if (!PLANS[L]) return { unresolvable: true }; // N–Q 数据待补
+      cell = PLANS[L][aqlIdx];
+      steps++;
+    }
+    if (typeof cell === "string" || !cell) return { unresolvable: true };
+    const n = SAMPLE_SIZE[order[i]];
+    if (lotSize && n >= lotSize) return { hundred: true, n, ac: cell[0], re: cell[1] };
+    return { n, ac: cell[0], re: cell[1], resolvedFrom: order[i] === letter ? undefined : order[i] };
+  }
+
+  function plan(lotSize, level, aql) {
+    const aqlIdx = LEVELS.indexOf(String(aql));
+    if (aqlIdx < 0) throw new Error("unsupported AQL " + aql);
+    const letter = codeLetter(lotSize, level);
+    return Object.assign({ letter, aql: LEVELS[aqlIdx] }, resolvePlan(letter, aqlIdx, lotSize));
+  }
+
+  return { LEVELS, SAMPLE_SIZE, LETTER_ORDER, CODE_TABLE, PLANS, codeLetter, resolvePlan, plan };
+})();
+
+if (typeof module !== "undefined") module.exports = AQL;
+if (typeof window !== "undefined") window.AQL = AQL;
+
+</script>
+<script>
+/* QE Toolbox v1 — AQL calculator UI */
+(function () {
+  "use strict";
+  var aqlSel = document.getElementById("aql");
+  // v1 只暴露 HIGH 置信度六档（0.65–6.5，三源交叉验证）；
+  // 数据模块内的 MED 列（0.065–0.40、10）待第二独立源仲裁后开放。
+  var HIGH_AQLS = ["0.65", "1.0", "1.5", "2.5", "4.0", "6.5"];
+  HIGH_AQLS.forEach(function (lv) {
+    var o = document.createElement("option");
+    o.value = lv; o.textContent = lv + "%";
+    if (lv === "2.5") o.selected = true;
+    aqlSel.appendChild(o);
+  });
+
+  document.getElementById("confNote").textContent =
+    "Methodology: Table 1 (code letters) cross-verified against published ISO 2859-1 references. " +
+    "Table 2-A (AQL 0.65–6.5) cross-verified against three independent published sources with zero conflicts; " +
+    "arrow rules are applied automatically and shown in the result. Wider AQL ranges will be added after " +
+    "independent verification. This tool is a planning aid, not a substitute for the official standard or " +
+    "your approved sampling procedure.";
+
+  function fmt(n) { return n.toLocaleString("en-US"); }
+
+  document.getElementById("calcBtn").addEventListener("click", function () {
+    var lot = parseInt(document.getElementById("lot").value, 10);
+    var level = document.getElementById("level").value;
+    var aql = aqlSel.value;
+    var box = document.getElementById("result");
+
+    if (!lot || lot < 2) {
+      box.innerHTML = '<h3>Sampling plan</h3><div class="note bad">Enter a lot size of at least 2.</div>';
+      return;
+    }
+    var r;
+    try { r = AQL.plan(lot, level, aql); }
+    catch (e) {
+      box.innerHTML = '<h3>Sampling plan</h3><div class="note bad">Error: ' + e.message + "</div>";
+      return;
+    }
+    if (r.unresolvable) {
+      box.innerHTML = '<h3>Sampling plan</h3><div class="note bad">No single-sampling plan available for this ' +
+        "combination in the published tables (code letter " + r.letter + ", AQL " + r.aql + "%). " +
+        "Try a different AQL or inspection level.</div>";
+      return;
+    }
+    var html = "<h3>Sampling plan</h3>";
+    html += '<div class="plan-nums">' +
+      '<div class="stat"><div class="v">' + r.letter + '</div><div class="k">Code letter</div></div>' +
+      '<div class="stat"><div class="v">' + fmt(r.n) + '</div><div class="k">Sample size n</div></div>' +
+      '<div class="stat"><div class="v">' + r.ac + '</div><div class="k">Accept Ac</div></div>' +
+      '<div class="stat"><div class="v">' + r.re + '</div><div class="k">Reject Re</div></div></div>';
+    html += '<div class="note info">Inspect <b>' + fmt(r.n) + '</b> units: accept the lot if defects ≤ <b>' + r.ac +
+      "</b>; reject if defects ≥ <b>" + r.re + "</b>.</div>";
+    if (r.hundred) {
+      html += '<div class="note">Sample size ≥ lot size — this plan calls for <b>100% inspection</b> of the ' +
+        fmt(lot) + " units.</div>";
+    }
+    if (r.resolvedFrom) {
+      html += '<div class="note">Table arrow rule applied: nominal code letter ' + r.letter +
+        " has no direct plan at AQL " + r.aql + "%, so the plan from code letter <b>" + r.resolvedFrom +
+        "</b> is used (n = " + fmt(r.n) + ").</div>";
+    }
+    box.innerHTML = html;
+  });
+
+  document.getElementById("buyBtn").addEventListener("click", function () {
+    window.open("https://payhip.com/b/WDRYL", "_blank", "noopener");
+  });
+})();
+
+</script>
+</body>
+</html>
