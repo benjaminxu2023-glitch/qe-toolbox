@@ -1,0 +1,1 @@
+{"name": "留住今天 · 私人日记", "short_name": "留住今天", "start_url": "./", "scope": "./", "display": "standalone", "background_color": "#f7f5ef", "theme_color": "#f7f5ef", "icons": [{"src": "icon.svg", "sizes": "192x192", "type": "image/svg+xml"}, {"src": "icon.svg", "sizes": "512x512", "type": "image/svg+xml"}]}
