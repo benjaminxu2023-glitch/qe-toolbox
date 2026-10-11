@@ -1,0 +1,1 @@
+留住今天 PWA：原生 HTML/CSS/JS，无后端。HTTPS 部署后可通过 Safari 添加到主屏幕。数据存储 localStorage，定期导出 JSON 备份。
